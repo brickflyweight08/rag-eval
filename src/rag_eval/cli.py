@@ -11,6 +11,8 @@ from typing import Any
 import typer
 
 from rag_eval.aggregate import METRICS
+from rag_eval.calibrate import calibrate as run_calibration
+from rag_eval.calibrate import load_labels, render_calibration
 from rag_eval.config import load_settings
 from rag_eval.llm import JudgeClient, JudgeConfigError
 from rag_eval.loading import DatasetError, SystemLoadError, validate_questions_file
@@ -250,6 +252,31 @@ def compare(
         text = render_compare(a, b, compare_runs(a, b, seed=seed))
     except (RunLoadError, CompareError) as exc:
         _fail(str(exc))
+    typer.echo(text)
+    if out is not None:
+        out.write_text(text, encoding="utf-8", newline="\n")
+
+
+@app.command()
+def calibrate(
+    labels: Path = typer.Option(..., help="Human-labelled claims JSONL file."),
+    out: Path | None = typer.Option(None, help="Also write the calibration text to this file."),
+    judge_base_url: str | None = JUDGE_BASE_URL,
+    judge_api_key: str | None = JUDGE_API_KEY,
+    judge_model: str | None = JUDGE_MODEL,
+    cache_path: str | None = CACHE_PATH,
+    no_cache: bool = NO_CACHE,
+    no_json_mode: bool = NO_JSON_MODE,
+) -> None:
+    """Measure judge-vs-human agreement (percentage and Cohen's kappa) on labelled claims."""
+    judge = _make_judge(
+        judge_base_url, judge_api_key, judge_model, cache_path, no_cache, no_json_mode
+    )
+    try:
+        result = run_calibration(load_labels(labels), judge)
+    except (DatasetError, JudgeConfigError, FileNotFoundError) as exc:
+        _fail(str(exc))
+    text = render_calibration(result)
     typer.echo(text)
     if out is not None:
         out.write_text(text, encoding="utf-8", newline="\n")
