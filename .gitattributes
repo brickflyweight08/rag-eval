@@ -1,0 +1,4 @@
+# Keep line endings stable so questions_sha256 is identical on every OS.
+* text=auto eol=lf
+*.png binary
+*.sqlite binary

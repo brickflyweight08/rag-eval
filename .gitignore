@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# Environments and secrets
+.venv/
+.env
+.env.*
+
+# Tool caches
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# rag-eval judge cache
+.rag_eval_cache.sqlite
+*.rag_eval_cache.sqlite
+
+# Run outputs: keep only summaries (and the config that explains them)
+runs/**
+!runs/**/
+!runs/**/summary.json
+!runs/**/config.json
