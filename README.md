@@ -58,12 +58,22 @@ RAG_EVAL_CACHE_PATH=.rag_eval_cache.sqlite
 RAG_EVAL_JUDGE_BASE_URL=https://api.your-provider.example/v1
 RAG_EVAL_JUDGE_API_KEY=sk-...
 RAG_EVAL_JUDGE_MODEL=your-strongest-model
+
+# Optional, for rate-limited (e.g. free-tier) endpoints and "thinking" models
+RAG_EVAL_JUDGE_MAX_RPM=8                 # client-side throttle, requests per minute
+RAG_EVAL_JUDGE_REASONING_EFFORT=low      # sent as reasoning_effort when set
 ```
 
 There is no default API key: without one, answer scoring stops with a clear message and
 `--retrieval-only` still works. Judge replies are cached in sqlite keyed by
 sha256(model + prompt); `--no-cache` bypasses it. If your endpoint rejects
 `response_format`, pass `--no-json-mode`.
+
+Rate-limit (429), 5xx and timeout errors are retried with backoff, using the server's
+retry hint when it gives one. If a **per-day** quota is exhausted, the run stops with an
+error instead of recording a judge failure on every remaining question. Re-run later and
+cached judgements are reused. The cache key does not include `reasoning_effort`, so use
+`--no-cache` after changing it.
 
 ## Commands
 

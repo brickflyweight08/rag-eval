@@ -21,7 +21,7 @@ rag-eval score --predictions preds.jsonl --questions questions.jsonl --k 5 --out
 rag-eval report runs/* --out REPORT.md
 rag-eval compare runs/A runs/B
 rag-eval calibrate --labels human_labels.jsonl
-# judge flags on run/score/calibrate: --judge-base-url --judge-api-key --judge-model --cache-path --no-cache --no-json-mode
+# judge flags on run/score/calibrate: --judge-base-url --judge-api-key --judge-model --cache-path --no-cache --no-json-mode --judge-max-rpm --judge-reasoning-effort
 
 pytest -m "not llm"                  # default test run; target < 30 s
 pytest tests/test_retrieval.py::test_name   # single test
@@ -77,7 +77,7 @@ Metrics are computed per question in `metrics/` (`metrics/answer.py` orchestrate
 - Never generate gold labels or reference answers with an LLM. Ground truth is the user's job.
 - Honest reporting: always show `mean [95% CI]` and the sample size. Never declare a winner when the CI includes zero. `compare` must refuse runs whose `questions_sha256` differ.
 - Judge prompts live only in `src/rag_eval/prompts/*.txt`. Never inline them in code.
-- Read env vars (`RAG_EVAL_JUDGE_BASE_URL`, `_API_KEY`, `_MODEL`, `RAG_EVAL_CACHE_PATH`) only in `config.py`. Every setting must also be overridable by a CLI flag. The judge is any OpenAI-compatible endpoint (Ollama URL/model by default, no default API key; the developer uses a hosted provider).
+- Read env vars (`RAG_EVAL_JUDGE_BASE_URL`, `_API_KEY`, `_MODEL`, `_MAX_RPM`, `_REASONING_EFFORT`, `RAG_EVAL_CACHE_PATH`) only in `config.py`. Every setting must also be overridable by a CLI flag. The judge is any OpenAI-compatible endpoint (Ollama URL/model by default, no default API key; the developer uses a hosted provider).
 - Testing:
   - Unit tests use `FakeJudgeClient` (scripted JSON) and `FakeRAGSystem` (fixed outputs; one variant raises).
   - Metrics are tested against hand-computed values.

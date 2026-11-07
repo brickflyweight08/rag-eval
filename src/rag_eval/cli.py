@@ -40,6 +40,12 @@ JUDGE_API_KEY = typer.Option(None, help="Judge API key [env RAG_EVAL_JUDGE_API_K
 JUDGE_MODEL = typer.Option(None, help="Judge model [env RAG_EVAL_JUDGE_MODEL].")
 CACHE_PATH = typer.Option(None, help="sqlite cache file [env RAG_EVAL_CACHE_PATH].")
 NO_CACHE = typer.Option(False, "--no-cache", help="Bypass the judge cache.")
+JUDGE_MAX_RPM = typer.Option(
+    None, help="Max judge requests per minute (client-side throttle) [env RAG_EVAL_JUDGE_MAX_RPM]."
+)
+JUDGE_REASONING_EFFORT = typer.Option(
+    None, help="reasoning_effort sent to the judge, e.g. low [env RAG_EVAL_JUDGE_REASONING_EFFORT]."
+)
 NO_JSON_MODE = typer.Option(
     False, "--no-json-mode", help="Do not send response_format=json_object (old endpoints)."
 )
@@ -81,8 +87,10 @@ def _make_judge(
     cache_path: str | None,
     no_cache: bool,
     no_json_mode: bool,
+    max_rpm: float | None = None,
+    reasoning_effort: str | None = None,
 ) -> JudgeClient:
-    settings = load_settings(base_url, api_key, model, cache_path)
+    settings = load_settings(base_url, api_key, model, cache_path, max_rpm, reasoning_effort)
     return JudgeClient.from_settings(settings, use_cache=not no_cache, json_mode=not no_json_mode)
 
 
@@ -158,10 +166,19 @@ def run(
     cache_path: str | None = CACHE_PATH,
     no_cache: bool = NO_CACHE,
     no_json_mode: bool = NO_JSON_MODE,
+    judge_max_rpm: float | None = JUDGE_MAX_RPM,
+    judge_reasoning_effort: str | None = JUDGE_REASONING_EFFORT,
 ) -> None:
     """Evaluate a live system through the RAGSystem plugin protocol."""
     judge = _make_judge(
-        judge_base_url, judge_api_key, judge_model, cache_path, no_cache, no_json_mode
+        judge_base_url,
+        judge_api_key,
+        judge_model,
+        cache_path,
+        no_cache,
+        no_json_mode,
+        judge_max_rpm,
+        judge_reasoning_effort,
     )
     try:
         artifacts = run_live(
@@ -200,10 +217,19 @@ def score(
     cache_path: str | None = CACHE_PATH,
     no_cache: bool = NO_CACHE,
     no_json_mode: bool = NO_JSON_MODE,
+    judge_max_rpm: float | None = JUDGE_MAX_RPM,
+    judge_reasoning_effort: str | None = JUDGE_REASONING_EFFORT,
 ) -> None:
     """Score an offline predictions file produced by any external system."""
     judge = _make_judge(
-        judge_base_url, judge_api_key, judge_model, cache_path, no_cache, no_json_mode
+        judge_base_url,
+        judge_api_key,
+        judge_model,
+        cache_path,
+        no_cache,
+        no_json_mode,
+        judge_max_rpm,
+        judge_reasoning_effort,
     )
     try:
         artifacts = score_offline(
@@ -271,10 +297,19 @@ def calibrate(
     cache_path: str | None = CACHE_PATH,
     no_cache: bool = NO_CACHE,
     no_json_mode: bool = NO_JSON_MODE,
+    judge_max_rpm: float | None = JUDGE_MAX_RPM,
+    judge_reasoning_effort: str | None = JUDGE_REASONING_EFFORT,
 ) -> None:
     """Measure judge-vs-human agreement (percentage and Cohen's kappa) on labelled claims."""
     judge = _make_judge(
-        judge_base_url, judge_api_key, judge_model, cache_path, no_cache, no_json_mode
+        judge_base_url,
+        judge_api_key,
+        judge_model,
+        cache_path,
+        no_cache,
+        no_json_mode,
+        judge_max_rpm,
+        judge_reasoning_effort,
     )
     try:
         result = run_calibration(load_labels(labels), judge)
