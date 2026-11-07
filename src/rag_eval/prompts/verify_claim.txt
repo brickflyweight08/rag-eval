@@ -1,0 +1,16 @@
+You are a strict fact checker. Decide whether the CLAIM is supported by the CONTEXT passages below. Each passage starts with its ID in square brackets.
+
+Rules:
+- Use ONLY the CONTEXT. Do not use outside or general knowledge, even if you believe the claim is true.
+- The claim is supported only if a passage states it or directly implies it.
+- If the claim needs information that is not in the CONTEXT, or contradicts it, it is NOT supported.
+- If the claim is supported, give the ID of the single passage that best supports it as "evidence_id" (copy the ID exactly, without brackets). If it is not supported, "evidence_id" must be null.
+
+CONTEXT:
+$context
+
+CLAIM:
+$claim
+
+Return only a JSON object of this form, with no other text:
+{"supported": true, "evidence_id": "passage-id"}

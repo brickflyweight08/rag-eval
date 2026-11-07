@@ -1,0 +1,17 @@
+You are a careful annotator. Split the ANSWER below into atomic factual claims.
+
+Rules:
+- An atomic claim states exactly one fact that could be checked on its own.
+- Rewrite each claim so it makes sense without the rest of the answer (replace pronouns with what they refer to).
+- Ignore hedges, greetings, politeness, statements about the answerer itself, and refusals such as "I don't know" or "the context does not say".
+- Ignore citation markers such as [doc-3]; do not turn them into claims.
+- If the answer contains no factual claims, return an empty list.
+
+QUESTION:
+$question
+
+ANSWER:
+$answer
+
+Return only a JSON object of this form, with no other text:
+{"claims": ["first claim", "second claim"]}

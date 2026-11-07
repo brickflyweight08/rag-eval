@@ -1,0 +1,12 @@
+Decide whether the ANSWER below is a refusal: the answerer declines to answer the QUESTION, or says it does not have enough information to answer it.
+
+An answer that gives any substantive answer to the question is NOT a refusal, even if it also adds a caveat.
+
+QUESTION:
+$question
+
+ANSWER:
+$answer
+
+Return only a JSON object of this form, with no other text:
+{"refused": true}

@@ -1,0 +1,20 @@
+You are grading an answer against a reference answer written by a human expert.
+
+Grades:
+- "correct": the answer contains the key facts of the reference and does not contradict it. Extra detail is fine if it does not contradict the reference.
+- "partial": the answer contains some but not all key facts of the reference, or is right but vague.
+- "incorrect": the answer contradicts the reference, misses its key facts, or refuses to answer.
+
+Judge meaning, not wording.
+
+QUESTION:
+$question
+
+REFERENCE ANSWER:
+$reference_answer
+
+ANSWER TO GRADE:
+$answer
+
+Return only a JSON object of this form, with no other text:
+{"verdict": "correct", "reason": "one short sentence"}
