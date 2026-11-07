@@ -14,6 +14,15 @@ from rag_eval.aggregate import METRICS
 from rag_eval.config import load_settings
 from rag_eval.llm import JudgeClient, JudgeConfigError
 from rag_eval.loading import DatasetError, SystemLoadError, validate_questions_file
+from rag_eval.report import (
+    CompareError,
+    RunLoadError,
+    compare_runs,
+    expand_run_paths,
+    load_run,
+    render_compare,
+    write_report,
+)
 from rag_eval.runner import RunArtifacts, run_live, score_offline
 
 app = typer.Typer(
@@ -207,6 +216,43 @@ def score(
         _fail(str(exc))
     _print_summary(artifacts)
     typer.echo(f"Wrote {out}/config.json, results.jsonl, summary.json")
+
+
+@app.command()
+def report(
+    runs: list[str] = typer.Argument(..., help="Run folders (globs such as runs/* work)."),
+    out: Path = typer.Option(Path("REPORT.md"), help="Markdown report path."),
+    questions: Path | None = typer.Option(
+        None, help="Questions file for gold IDs in the failure log (default: from config)."
+    ),
+) -> None:
+    """Write a markdown report (tables with CIs, charts, failure log) for one or more runs."""
+    try:
+        loaded = [load_run(p) for p in expand_run_paths(runs)]
+    except (RunLoadError, ValueError) as exc:
+        _fail(str(exc))
+    if not loaded:
+        _fail("no run folders found (a run folder contains config.json)")
+    path = write_report(loaded, out, questions)
+    typer.echo(f"Wrote {path} ({len(loaded)} run(s))")
+
+
+@app.command()
+def compare(
+    run_a: Path = typer.Argument(..., help="Baseline run folder (A)."),
+    run_b: Path = typer.Argument(..., help="Candidate run folder (B)."),
+    out: Path | None = typer.Option(None, help="Also write the comparison to this file."),
+    seed: int = typer.Option(0, help="Bootstrap seed."),
+) -> None:
+    """Paired bootstrap comparison B − A over the same questions."""
+    try:
+        a, b = load_run(run_a), load_run(run_b)
+        text = render_compare(a, b, compare_runs(a, b, seed=seed))
+    except (RunLoadError, CompareError) as exc:
+        _fail(str(exc))
+    typer.echo(text)
+    if out is not None:
+        out.write_text(text, encoding="utf-8", newline="\n")
 
 
 if __name__ == "__main__":  # pragma: no cover
