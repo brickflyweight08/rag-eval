@@ -54,7 +54,7 @@ def test_fmt_stat():
     assert (
         fmt_stat({"mean": 0.8, "low": 0.6, "high": 1.0, "n": 12}) == "0.800 [0.600, 1.000] (n=12)"
     )
-    assert fmt_stat({"mean": None, "low": None, "high": None, "n": 0}) == "–"
+    assert fmt_stat({"mean": None, "low": None, "high": None, "n": 0}) == "-"
 
 
 def test_md_table_escapes_pipes():

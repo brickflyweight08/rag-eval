@@ -29,7 +29,7 @@ MAIN_METRICS = [
 DIAGNOSTIC_METRICS = ["precision", "hallucinated_citation_rate", "false_refusal_rate"]
 COMPARE_METRICS = MAIN_METRICS + DIAGNOSTIC_METRICS
 N_FAILURES = 5
-DASH = "–"
+DASH = "-"
 
 
 class RunLoadError(ValueError):
@@ -387,8 +387,8 @@ def compare_runs(
     if a.config.questions_sha256 != b.config.questions_sha256:
         raise CompareError(
             f"runs used different question files: {a.name} has questions_sha256 "
-            f"{_short(a.config.questions_sha256)}…, {b.name} has "
-            f"{_short(b.config.questions_sha256)}…. Re-run both on the same frozen "
+            f"{_short(a.config.questions_sha256)}..., {b.name} has "
+            f"{_short(b.config.questions_sha256)}.... Re-run both on the same frozen "
             "benchmark before comparing."
         )
     specs = [METRICS_BY_KEY[key] for key in COMPARE_METRICS]
@@ -412,6 +412,8 @@ def describe_difference(label: str, stat: dict[str, Any], spec: MetricSpec) -> s
         f"{label} {_pts(stat['diff'])} pts [95% CI {_pts(stat['low'])}, {_pts(stat['high'])}] "
         f"(n={stat['n']})"
     )
+    if stat["low"] == stat["high"] == 0:
+        return f"{text}: identical on every question."
     if stat["low"] <= 0 <= stat["high"]:
         return f"{text}: the CI includes zero, so the difference is not clear at this sample size."
     direction = "higher" if stat["diff"] > 0 else "lower"
@@ -429,7 +431,7 @@ def render_compare(a: LoadedRun, b: LoadedRun, comparison: dict[str, Any]) -> st
     lines = [
         f"# Comparison: B = {b.name} vs A = {a.name}",
         "",
-        "Differences are B − A in percentage points with a paired bootstrap 95% CI, "
+        "Differences are B - A in percentage points with a paired bootstrap 95% CI, "
         "computed over questions scored in both runs. A CI that includes zero means the "
         "difference is not clear at this sample size.",
         "",

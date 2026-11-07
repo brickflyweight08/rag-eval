@@ -174,7 +174,8 @@ def _finish(
     config = RunConfig(
         run_id=run_id,
         system=system,
-        system_kwargs=system_kwargs,
+        # Non-JSON values (possible from Python, e.g. a function) are stored as text.
+        system_kwargs=json.loads(json.dumps(system_kwargs, default=repr)),
         k=k,
         judge_model=judge.model,
         questions_path=questions_path,

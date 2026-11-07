@@ -1,0 +1,342 @@
+{
+  "k": 3,
+  "n_questions": 15,
+  "n_answerable": 12,
+  "n_unanswerable": 3,
+  "n_errors": 0,
+  "n_answered": 0,
+  "bootstrap": {
+    "n_resamples": 2000,
+    "alpha": 0.05,
+    "seed": 0
+  },
+  "overall": {
+    "hit": {
+      "mean": 0.9166666666666666,
+      "low": 0.75,
+      "high": 1.0,
+      "n": 12
+    },
+    "recall": {
+      "mean": 0.8333333333333334,
+      "low": 0.665625,
+      "high": 1.0,
+      "n": 12
+    },
+    "precision": {
+      "mean": 0.3611111111111111,
+      "low": 0.2777777777777778,
+      "high": 0.4444444444444445,
+      "n": 12
+    },
+    "mrr": {
+      "mean": 0.8194444444444443,
+      "low": 0.6249999999999999,
+      "high": 1.0,
+      "n": 12
+    },
+    "groundedness": {
+      "mean": null,
+      "low": null,
+      "high": null,
+      "n": 0
+    },
+    "citation_precision": {
+      "mean": null,
+      "low": null,
+      "high": null,
+      "n": 0
+    },
+    "hallucinated_citation_rate": {
+      "mean": null,
+      "low": null,
+      "high": null,
+      "n": 0
+    },
+    "correctness": {
+      "mean": null,
+      "low": null,
+      "high": null,
+      "n": 0
+    },
+    "refusal_accuracy": {
+      "mean": null,
+      "low": null,
+      "high": null,
+      "n": 0
+    },
+    "false_refusal_rate": {
+      "mean": null,
+      "low": null,
+      "high": null,
+      "n": 0
+    }
+  },
+  "latency_ms": {
+    "p50": 0.08589999970354256,
+    "p95": 0.23593999985678232,
+    "n": 15
+  },
+  "per_qtype": {
+    "lookup": {
+      "n_questions": 5,
+      "metrics": {
+        "hit": {
+          "mean": 1.0,
+          "low": 1.0,
+          "high": 1.0,
+          "n": 5
+        },
+        "recall": {
+          "mean": 1.0,
+          "low": 1.0,
+          "high": 1.0,
+          "n": 5
+        },
+        "precision": {
+          "mean": 0.3333333333333333,
+          "low": 0.3333333333333333,
+          "high": 0.3333333333333333,
+          "n": 5
+        },
+        "mrr": {
+          "mean": 1.0,
+          "low": 1.0,
+          "high": 1.0,
+          "n": 5
+        },
+        "groundedness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "citation_precision": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "hallucinated_citation_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "correctness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "refusal_accuracy": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "false_refusal_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        }
+      }
+    },
+    "multi_passage": {
+      "n_questions": 4,
+      "metrics": {
+        "hit": {
+          "mean": 1.0,
+          "low": 1.0,
+          "high": 1.0,
+          "n": 4
+        },
+        "recall": {
+          "mean": 0.75,
+          "low": 0.5,
+          "high": 1.0,
+          "n": 4
+        },
+        "precision": {
+          "mean": 0.49999999999999994,
+          "low": 0.3333333333333333,
+          "high": 0.6666666666666666,
+          "n": 4
+        },
+        "mrr": {
+          "mean": 0.8333333333333334,
+          "low": 0.49999999999999994,
+          "high": 1.0,
+          "n": 4
+        },
+        "groundedness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "citation_precision": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "hallucinated_citation_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "correctness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "refusal_accuracy": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "false_refusal_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        }
+      }
+    },
+    "paraphrase": {
+      "n_questions": 3,
+      "metrics": {
+        "hit": {
+          "mean": 0.6666666666666666,
+          "low": 0.0,
+          "high": 1.0,
+          "n": 3
+        },
+        "recall": {
+          "mean": 0.6666666666666666,
+          "low": 0.0,
+          "high": 1.0,
+          "n": 3
+        },
+        "precision": {
+          "mean": 0.2222222222222222,
+          "low": 0.0,
+          "high": 0.3333333333333333,
+          "n": 3
+        },
+        "mrr": {
+          "mean": 0.5,
+          "low": 0.0,
+          "high": 1.0,
+          "n": 3
+        },
+        "groundedness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "citation_precision": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "hallucinated_citation_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "correctness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "refusal_accuracy": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "false_refusal_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        }
+      }
+    },
+    "unanswerable": {
+      "n_questions": 3,
+      "metrics": {
+        "hit": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "recall": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "precision": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "mrr": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "groundedness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "citation_precision": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "hallucinated_citation_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "correctness": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "refusal_accuracy": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        },
+        "false_refusal_rate": {
+          "mean": null,
+          "low": null,
+          "high": null,
+          "n": 0
+        }
+      }
+    }
+  }
+}

@@ -4,15 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Status and spec
 
-The spec is `IMPLEMENTATION_PLAN.md` in this folder. Section 9 of that file refers to `docs/IMPLEMENTATION_PLAN.md`, but no such path exists. As of this writing, no code exists yet, so the commands and layout below come from the plan and are not yet verified.
+The spec is `IMPLEMENTATION_PLAN.md` in this folder (Section 9 of it says `docs/IMPLEMENTATION_PLAN.md`; the file stays at the repo root). Phases R1-R8 are implemented and tagged `v0.1.0`. Decisions the spec left open are recorded in `docs/adr/`; domain terms are in `docs/glossary.md`. Read the relevant ADR before changing behaviour it describes.
 
 - Work **one phase at a time, in order** (R1 → R8). A phase is done only when every acceptance criterion in the plan passes.
 - **Ask the developer before changing the public API**: `schema.py` types, the `RAGSystem` protocol in `protocols.py`, and the `__init__.py` exports (`EvalQuestion`, `RetrievedChunk`, `SystemOutput`, `Prediction`, `RAGSystem`, `run_live`, `score_offline`, `load_questions`). Other projects depend on it. Everything else is internal.
 
-## Commands (planned)
+## Commands
 
 ```bash
-pip install -e ".[demo,dev]"         # demo = rank-bm25 + sentence-transformers; dev = pytest + ruff
+uv venv --python 3.12 .venv && uv pip install -e ".[demo,dev]"   # demo = rank-bm25 + sentence-transformers
 
 rag-eval validate questions.jsonl
 rag-eval run --system pkg.module:factory --system-kwargs '{"strategy": "hybrid"}' \
@@ -21,15 +21,19 @@ rag-eval score --predictions preds.jsonl --questions questions.jsonl --k 5 --out
 rag-eval report runs/* --out REPORT.md
 rag-eval compare runs/A runs/B
 rag-eval calibrate --labels human_labels.jsonl
+# judge flags on run/score/calibrate: --judge-base-url --judge-api-key --judge-model --cache-path --no-cache --no-json-mode
 
 pytest -m "not llm"                  # default test run; target < 30 s
 pytest tests/test_retrieval.py::test_name   # single test
-pytest -m llm                        # tests that make real judge calls
-ruff check . && ruff format .
+pytest -m llm                        # real judge calls; auto-skipped when RAG_EVAL_JUDGE_API_KEY is unset
+RAG_EVAL_TEST_DENSE=1 pytest tests/test_toy_demo.py   # also run the slow dense-embedding demo test
+ruff check . && ruff format --check .
 grep -ri "arango\|mysql\|restaurant" src/   # must return nothing (R8 acceptance check)
 ```
 
-The demo systems for the toy demo are `examples.toy_handbook.systems:make_bm25` and `examples.toy_handbook.systems:make_dense`.
+The demo systems for the toy demo are `examples.toy_handbook.systems:make_bm25` and `examples.toy_handbook.systems:make_dense` (run from the repo root: `load_system` adds the cwd to `sys.path`). Their generator reads `RAG_EVAL_DEMO_*`, falling back to `RAG_EVAL_JUDGE_*`.
+
+Test doubles live in `tests/fakes.py` (`FakeJudgeClient`, `FakeRAGSystem`); plugin factories for loader tests in `tests/fake_plugins.py`. The demo's `human_labels.jsonl` is a Claude-drafted placeholder (ADR 0006): never describe it as human-labelled.
 
 ## Architecture
 
@@ -38,7 +42,7 @@ There are two ways to evaluate a system. Both write the same outputs to `--out`:
 - **Live (`runner.run_live`):** `loading.load_system("module:factory", kwargs)` imports a factory that returns an object satisfying `RAGSystem`. For each question, the runner calls `retrieve(question, k)` to compute retrieval metrics, then `answer(question, k)` to compute answer metrics. Answer metrics are computed on **`output.context`**, the chunks the generator actually saw, not on the `retrieve` result. If `answer` raises `NotImplementedError`, the system is treated as retrieval-only. Any other exception is recorded in `QuestionResult.error`, and the run continues.
 - **Offline (`runner.score_offline`):** reads a `Prediction` JSONL file produced by any external system. No plugin is needed.
 
-Metrics are computed per question in `metrics/`, then aggregated by `stats.py`:
+Metrics are computed per question in `metrics/` (`metrics/answer.py` orchestrates the answer metrics), then aggregated in `aggregate.py` (one `METRICS` table shared by `summary.json`, `report.py` and `compare`) using `stats.py`:
 
 - **Retrieval metrics** (hit, recall, precision, reciprocal rank):
   - Pure set arithmetic over gold IDs vs. the top-k retrieved IDs.
@@ -73,7 +77,7 @@ Metrics are computed per question in `metrics/`, then aggregated by `stats.py`:
 - Never generate gold labels or reference answers with an LLM. Ground truth is the user's job.
 - Honest reporting: always show `mean [95% CI]` and the sample size. Never declare a winner when the CI includes zero. `compare` must refuse runs whose `questions_sha256` differ.
 - Judge prompts live only in `src/rag_eval/prompts/*.txt`. Never inline them in code.
-- Read env vars (`RAG_EVAL_JUDGE_BASE_URL`, `_API_KEY`, `_MODEL`, `RAG_EVAL_CACHE_PATH`) only in `config.py`. Every setting must also be overridable by a CLI flag. The judge is any OpenAI-compatible endpoint (Ollama by default).
+- Read env vars (`RAG_EVAL_JUDGE_BASE_URL`, `_API_KEY`, `_MODEL`, `RAG_EVAL_CACHE_PATH`) only in `config.py`. Every setting must also be overridable by a CLI flag. The judge is any OpenAI-compatible endpoint (Ollama URL/model by default, no default API key; the developer uses a hosted provider).
 - Testing:
   - Unit tests use `FakeJudgeClient` (scripted JSON) and `FakeRAGSystem` (fixed outputs; one variant raises).
   - Metrics are tested against hand-computed values.

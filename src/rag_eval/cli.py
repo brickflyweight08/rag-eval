@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import logging
+import sys
 from collections import Counter
 from pathlib import Path
 from typing import Any
@@ -58,6 +59,9 @@ def main(
     verbose: bool = typer.Option(True, "--verbose/--quiet", help="Per-question progress."),
 ) -> None:
     """Evaluate retrieval-augmented generation (RAG) systems."""
+    for stream in (sys.stdout, sys.stderr):  # never crash on a Windows code page
+        if hasattr(stream, "reconfigure"):
+            stream.reconfigure(errors="replace")
     logging.basicConfig(
         level=logging.INFO if verbose else logging.WARNING, format="%(message)s", force=True
     )
@@ -246,7 +250,7 @@ def compare(
     out: Path | None = typer.Option(None, help="Also write the comparison to this file."),
     seed: int = typer.Option(0, help="Bootstrap seed."),
 ) -> None:
-    """Paired bootstrap comparison B − A over the same questions."""
+    """Paired bootstrap comparison B - A over the same questions."""
     try:
         a, b = load_run(run_a), load_run(run_b)
         text = render_compare(a, b, compare_runs(a, b, seed=seed))
