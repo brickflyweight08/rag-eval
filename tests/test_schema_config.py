@@ -19,6 +19,8 @@ def test_public_exports():
         "Prediction",
         "RAGSystem",
         "load_questions",
+        "run_live",
+        "score_offline",
     }
     assert expected <= set(rag_eval.__all__)
     for name in expected:

@@ -87,15 +87,15 @@ class JudgeCache:
     """A tiny sqlite key-value store: sha256(model + prompt) -> JSON response."""
 
     def __init__(self, path: str | Path) -> None:
-        self.path = str(path)
-        with self._connect() as conn:
-            conn.execute(
-                "CREATE TABLE IF NOT EXISTS judge_cache ("
-                "key TEXT PRIMARY KEY, model TEXT, response TEXT, created_at TEXT)"
-            )
+        self.path = str(path)  # the file is created on first use, not here
 
     def _connect(self) -> sqlite3.Connection:
-        return sqlite3.connect(self.path)
+        conn = sqlite3.connect(self.path)
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS judge_cache ("
+            "key TEXT PRIMARY KEY, model TEXT, response TEXT, created_at TEXT)"
+        )
+        return conn
 
     def get(self, key: str) -> str | None:
         conn = self._connect()
