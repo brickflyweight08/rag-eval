@@ -44,25 +44,26 @@ steps with explanations.
 
 ## Configuration
 
-The judge is any **OpenAI-compatible** endpoint, set with environment variables (each
-also has a CLI flag such as `--judge-model`; flags win):
+The judge is any **OpenAI-compatible** endpoint. Gemini provides one, so the existing
+`openai` client can call Gemini without an SDK or dependency change. For Gemini, set
+these variables in PowerShell before running `rag-eval` (the command-line flags, such as
+`--judge-model`, override the environment):
 
-```bash
-# Local Ollama
-RAG_EVAL_JUDGE_BASE_URL=http://localhost:11434/v1
-RAG_EVAL_JUDGE_API_KEY=ollama            # any non-empty string for Ollama
-RAG_EVAL_JUDGE_MODEL=llama3.1:8b         # prefer a stronger model than the system under test
-RAG_EVAL_CACHE_PATH=.rag_eval_cache.sqlite
-
-# Hosted provider (example)
-RAG_EVAL_JUDGE_BASE_URL=https://api.your-provider.example/v1
-RAG_EVAL_JUDGE_API_KEY=sk-...
-RAG_EVAL_JUDGE_MODEL=your-strongest-model
-
-# Optional, for rate-limited (e.g. free-tier) endpoints and "thinking" models
-RAG_EVAL_JUDGE_MAX_RPM=8                 # client-side throttle, requests per minute
-RAG_EVAL_JUDGE_REASONING_EFFORT=low      # sent as reasoning_effort when set
+```powershell
+$env:RAG_EVAL_JUDGE_BASE_URL = "https://generativelanguage.googleapis.com/v1beta/openai/"
+$env:RAG_EVAL_JUDGE_API_KEY = "your-Gemini-API-key"
+$env:RAG_EVAL_JUDGE_MODEL = "gemini-3.5-flash"
+$env:RAG_EVAL_JUDGE_MAX_RPM = "8"
+$env:RAG_EVAL_JUDGE_REASONING_EFFORT = "low"
+rag-eval run --system my_pkg.my_module:make_system --questions questions.jsonl --k 5 --out runs/gemini
 ```
+
+To use the restaurant project's `.env` settings instead, run `python cli.py eval-all` from
+`restaurant-graphrag-2`. It reuses `LLM_API_KEY` and the Gemini endpoint for the judge unless
+you set a separate `RAG_EVAL_JUDGE_API_KEY` in that project's `.env`.
+
+For local Ollama, use `http://localhost:11434/v1`, any non-empty API key such as `ollama`,
+and your local model name. Set `RAG_EVAL_CACHE_PATH` to choose the sqlite cache location.
 
 There is no default API key: without one, answer scoring stops with a clear message and
 `--retrieval-only` still works. Judge replies are cached in sqlite keyed by
